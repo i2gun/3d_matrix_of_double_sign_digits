@@ -14,21 +14,18 @@ int[,,] Create3DMatrix(int n, int m, int d) {
 }
 
 int[,,] Shuffle3DMatrix(int[,,] matrix) {
-    int n1, m1, k1;
-    int n2, m2, k2;
+    int[] n = new int[6];
     int temp;
     for (int i = 0; i < 1000; i++) {
-        n1 = new Random().Next(0, matrix.GetLength(0));
-        m1 = new Random().Next(0, matrix.GetLength(1));
-        k1 = new Random().Next(0, matrix.GetLength(2));
+        int k = 0;
+        for (int j = 0; j < 6; j++) {
+            if (k == 3) k = 0;
+            n[j] = new Random().Next(0, matrix.GetLength(k++));
+        }
 
-        n2 = new Random().Next(0, matrix.GetLength(0));
-        m2 = new Random().Next(0, matrix.GetLength(1));
-        k2 = new Random().Next(0, matrix.GetLength(2));
-
-        temp = matrix[n1, m1, k1];
-        matrix[n1, m1, k1] = matrix[n2, m2, k2];
-        matrix[n2, m2, k2] = temp;
+        temp = matrix[n[0], n[1], n[2]];
+        matrix[n[0], n[1], n[2]] = matrix[n[3], n[4], n[5]];
+        matrix[n[3], n[4], n[5]] = temp;
     }
     return  matrix;
 }
@@ -37,13 +34,13 @@ void PrintMatrix(int[,,] matrix) {
     for (int i = 0; i < matrix.GetLength(2); i++) {
         Console.WriteLine($" --- {i} --- ");
 
-        Console.Write("   ");
+        Console.Write("__|");
         for (int k = 0; k < matrix.GetLength(1); k++)
-            Console.Write($" {k} ");
+            Console.Write($"_{k}_");
         Console.WriteLine();
 
         for (int j = 0; j < matrix.GetLength(0); j++) {
-            Console.Write($" {j} ");
+            Console.Write($" {j}|");
             for (int k = 0; k < matrix.GetLength(1); k++) {
                 Console.Write($"{matrix[k, j, i]:d2} ");
             }
@@ -53,22 +50,16 @@ void PrintMatrix(int[,,] matrix) {
     }
 }
 
-int n = 0;
-Console.Write("Please, enter the size of the first dimention: ");
-while (!int.TryParse(Console.ReadLine(), out n) || n < 2 || n > 22) {
-    Console.Write("This is not a valid size. Please, enter the first dimention: ");
+int InputDimentions(string order, double leftLimit, double rightLimit) {
+    int n = 0;
+    Console.Write($"Please, enter the size of the {order} dimention: ");
+    while (!int.TryParse(Console.ReadLine(), out n) || n < leftLimit || n > rightLimit) {
+        Console.Write("This is not a valid size. Please, enter the first dimention: ");
+    }
+    return n;
 }
-
-int m = 0;
-Console.Write("Please, enter the size of the second dimention: ");
-while (!int.TryParse(Console.ReadLine(), out m) || n * m < 4 || n * m > 44 ) {
-    Console.Write("This is not a valid size. Please, enter the second dimention: ");
-}
-
-int d = 0;
-Console.Write("Please, enter the size of the third dimention: ");
-while (!int.TryParse(Console.ReadLine(), out d) || d * n * m < 8 || d * n * m > 90 ) {
-    Console.Write("This is not a valid size. Please, enter the third dimention: ");
-}
+int n = InputDimentions("first", 2, 22);
+int m = InputDimentions("second", 4 / n, 44 / n);
+int d = InputDimentions("third", 8 / n / m, 90 / n / m);
 
 PrintMatrix(Shuffle3DMatrix(Create3DMatrix(n, m, d)));
